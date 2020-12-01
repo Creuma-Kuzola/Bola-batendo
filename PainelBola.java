@@ -20,11 +20,18 @@ import javax.swing.JPanel;
 public class PainelBola extends JPanel implements Runnable{
     
     private final Thread thread;
-    int x= 0, y = 0, velocidadeX = 10, velocidadeY = 10;
+    int x= 0;
     int altura, largura;
+    
+    private double aceleracao = (double) -9.8;
+    private double vInicialY = 0;
+    private double vFinalY = 0;
+    private double vFinalYAntesdaQueda = 0;
+    private double tempo = 0;
+    private double espacoY=0;
+    private double y =0 ,velocidadeY = 9.8;
+    
 
-    
-    
     /**
      *
      * @param g
@@ -34,6 +41,7 @@ public class PainelBola extends JPanel implements Runnable{
     
         thread = new Thread(this);
         thread.start();
+        calcularVars();
     }
     
     @Override
@@ -48,34 +56,45 @@ public class PainelBola extends JPanel implements Runnable{
         g2d.fill(bola);
     }
     
+    public void calcularVars()
+    {
+        
+       espacoY = -larguraDimensaoDaTela()/2;
+       vFinalYAntesdaQueda = 2*aceleracao*espacoY;
+       vFinalYAntesdaQueda = - java.lang.Math.sqrt(vFinalYAntesdaQueda);
+       tempo = vFinalYAntesdaQueda/aceleracao;
+       
+        System.out.println("Altura"+espacoY+ "\n" + "Velocidade Final: "+ vFinalYAntesdaQueda+ "\n" + 
+        "tempo: " + tempo);
+        
+        
+    }
     
+   
     // Função responsável por movimentar a bola
     public void movimentar() {
     
        // Subtraí 60 na altura para garantir que a bola não "afunda-se" ou desaparecesse da tela.
-       largura = larguraDimensaoDaTela()/2;
+       largura = larguraDimensaoDaTela()/2-25;
        altura = alturaDimensaoDaTela()/2 -70;
        
-       x+=velocidadeX;
-       y+=velocidadeY;
+       x = largura/2;
+      
+       System.out.println("Y: "+y);
        
-        if (x > largura) {
-            
-            velocidadeX*=-1;
-        } 
-        else if( x < 0) {
-            velocidadeX*=-1;
-        }
-        
-
-        if(y > altura)
+      if(y < 0){
+            velocidadeY*=-1;  
+       }
+       
+     else if(y > altura){
             velocidadeY*=-1;
-        else if( y < 0){
-            velocidadeY*=-1;
-        }
-    
+           
+            System.out.println("Y: "+y);
+      }
+       y +=velocidadeY;
     
     }
+
     
     // Funções para pegar a largura e a altura do screen 
      public int larguraDimensaoDaTela(){
@@ -101,11 +120,10 @@ public class PainelBola extends JPanel implements Runnable{
             
             while(true)
             {
-
+                super.repaint();
                 this.movimentar();
                 Thread.sleep(22);
-                super.repaint();
-            
+        
             }
         } catch (InterruptedException ex) {
             System.out.println("ERRO");
